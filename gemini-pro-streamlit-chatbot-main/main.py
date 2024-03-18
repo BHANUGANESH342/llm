@@ -13,29 +13,12 @@ st.set_page_config(
     layout="centered",  # Page layout option
 )
 
-# Add custom CSS for 3D effect
-st.markdown(
-    """
-    <style>
-    /* Add 3D effect to the chatbot container */
-    .stChatMessage:nth-child(odd) {
-        background-color: #f1f1f1;
-        border-radius: 10px;
-        box-shadow: 5px 5px 15px #aaaaaa,
-                    -5px -5px 15px #ffffff;
-        padding: 10px;
-        margin: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Set up Google Gemini-Pro AI model
 gen_ai.configure(api_key=GOOGLE_API_KEY)
 model = gen_ai.GenerativeModel('gemini-pro')
+
 
 # Function to translate roles between Gemini-Pro and Streamlit terminology
 def translate_role_for_streamlit(user_role):
@@ -44,9 +27,11 @@ def translate_role_for_streamlit(user_role):
     else:
         return user_role
 
+
 # Initialize chat session in Streamlit if not already present
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = model.start_chat(history=[])
+
 
 # Display the chatbot's title on the page
 st.title("🤖 BHANU_GANESH - ChatBot")
@@ -68,3 +53,26 @@ if user_prompt:
     # Display Gemini-Pro's response
     with st.chat_message("assistant"):
         st.markdown(gemini_response.text)
+
+# Upload image
+uploaded_file = st.file_uploader("3dfs.jpeg", type=["jpg", "png", "jpeg"])
+
+# Display uploaded image with 3D effect
+if uploaded_file is not None:
+    # Read the uploaded image
+    image = uploaded_file.read()
+
+    # Apply 3D effect using CSS styling
+    st.markdown(
+        f"""
+        <style>
+        .uploaded-image {{
+            perspective: 1000px;
+            transform: rotateY(20deg);
+        }}
+        </style>
+        """
+    )
+
+    # Display the uploaded image with the applied 3D effect
+    st.image(image, caption='Uploaded Image', use_column_width=True, output_format='JPEG')
