@@ -2,6 +2,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as gen_ai
+import easyocr
+from PIL import Image
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +21,8 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 gen_ai.configure(api_key=GOOGLE_API_KEY)
 model = gen_ai.GenerativeModel('gemini-pro')
 
+# Initialize EasyOCR
+reader = easyocr.Reader(['en'])
 
 # Function to translate roles between Gemini-Pro and Streamlit terminology
 def translate_role_for_streamlit(user_role):
@@ -26,6 +30,13 @@ def translate_role_for_streamlit(user_role):
         return "assistant"
     else:
         return user_role
+
+
+# Function to extract text from an image using EasyOCR
+def extract_text_from_image(image):
+    result = reader.readtext(image)
+    extracted_text = '\n'.join([text[1] for text in result])
+    return extracted_text
 
 
 # Initialize chat session in Streamlit if not already present
@@ -55,24 +66,21 @@ if user_prompt:
         st.markdown(gemini_response.text)
 
 # Upload image
-uploaded_file = st.file_uploader("3dfs.jpeg", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("Upload an image", type=["jpg", "png", "jpeg"])
 
-# Display uploaded image with 3D effect
+# Display uploaded image with OCR text extraction
 if uploaded_file is not None:
     # Read the uploaded image
-    image = uploaded_file.read()
+    image = Image.open(uploaded_file)
 
-    # Apply 3D effect using CSS styling
-    st.markdown(
-        f"""
-        <style>
-        .uploaded-image {{
-            perspective: 1000px;
-            transform: rotateY(20deg);
-        }}
-        </style>
-        """
-    )
+    # Display the uploaded image
+    st.image(image, caption='Uploaded Image', use_column_width=True)
 
-    # Display the uploaded image with the applied 3D effect
-    st.image(image, caption='Uploaded Image', use_column_width=True, output_format='JPEG')
+    # Button to trigger OCR text extraction
+    if st.button("Extract Text with OCR"):
+        # Extract text from the uploaded image
+        extracted_text = extract_text_from_image(image)
+        
+        # Display the extracted text
+        st.subheader("Extracted Text:")
+        st.write(extracted_text)
