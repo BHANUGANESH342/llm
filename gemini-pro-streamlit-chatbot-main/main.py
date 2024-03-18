@@ -15,9 +15,8 @@ st.set_page_config(
     layout="centered",  # Page layout option
 )
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
 # Set up Google Gemini-Pro AI model
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 gen_ai.configure(api_key=GOOGLE_API_KEY)
 model = gen_ai.GenerativeModel('gemini-pro')
 
@@ -78,7 +77,7 @@ if uploaded_file is not None:
 
     # Button to trigger OCR text extraction
     if st.button("Extract Text with OCR"):
-        # Extract text from the uploaded image
+        # Extract text from the uploaded image using EasyOCR
         extracted_text = extract_text_from_image(image)
 
         # Display the extracted text
