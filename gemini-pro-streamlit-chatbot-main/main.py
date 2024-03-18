@@ -1,9 +1,7 @@
 import os
-
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as gen_ai
-
 
 # Load environment variables
 load_dotenv()
@@ -11,7 +9,7 @@ load_dotenv()
 # Configure Streamlit page settings
 st.set_page_config(
     page_title="CHAT WITH BHANU'S AI!",
-    page_icon="\U0001F4A1" , # Light bulb emoji
+    page_icon="\U0001F4A1",  # Light bulb emoji
     layout="centered",  # Page layout option
 )
 
@@ -55,3 +53,26 @@ if user_prompt:
     # Display Gemini-Pro's response
     with st.chat_message("assistant"):
         st.markdown(gemini_response.text)
+
+# Upload image
+uploaded_file = st.file_uploader("3dfs.jpeg", type=["jpg", "png", "jpeg"])
+
+# Display uploaded image with 3D effect
+if uploaded_file is not None:
+    # Read the uploaded image
+    image = uploaded_file.read()
+
+    # Apply 3D effect using CSS styling
+    st.markdown(
+        f"""
+        <style>
+        .uploaded-image {{
+            perspective: 1000px;
+            transform: rotateY(20deg);
+        }}
+        </style>
+        """
+    )
+
+    # Display the uploaded image with the applied 3D effect
+    st.image(image, caption='Uploaded Image', use_column_width=True, output_format='JPEG')
